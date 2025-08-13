@@ -45,3 +45,21 @@ function updatePriority(taskId, newPriority) {
     })
     .catch(err => console.error(err));
 }
+
+// Countdown timer in JavaScript
+// let timeLeft = <?php echo $time_left; ?>;
+
+function updateTimer() {
+    if (timeLeft <= 0) {
+        document.getElementById('timer').innerHTML = "OTP expired. Please register again.";
+        document.querySelector('button[type="submit"]').disabled = true;
+        return;
+    }
+
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+    document.getElementById('timer').innerHTML = `Time left: ${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+    timeLeft--;
+}
+
+setInterval(updateTimer, 1000);
