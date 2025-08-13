@@ -12,11 +12,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $conn->real_escape_string($_POST['title']);
     $description = $conn->real_escape_string($_POST['description']);
     $due_date = $_POST['due_date'];
-    $status = $_POST['status'];
     $priority = $_POST['priority'];
 
     $user_id = $_SESSION['user_id'];
-    $sql = "INSERT INTO tasks (title, description, due_date, status, priority, user_id) VALUES ('$title', '$description', '$due_date', '$status', '$priority', $user_id)";
+    $sql = "INSERT INTO tasks (title, description, due_date, status, priority, user_id) VALUES ('$title', '$description', '$due_date', 'To-do', '$priority', $user_id)";
 
     if ($conn->query($sql) === TRUE) {
         header("Location: index.php");
