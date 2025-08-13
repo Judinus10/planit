@@ -45,6 +45,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <label>Due Date:</label><br>
     <input type="date" name="due_date"><br>
 
+    <label>Assigned to : </label><br>
+    <select name="assigned_to">
+    </select><br><br>
+
     <label>Priority:</label><br>
     <select name="priority">
       <option value="low">Low</option>
