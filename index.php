@@ -51,7 +51,13 @@ $result = $conn->query($sql);
             <td><?php echo htmlspecialchars($task['title']); ?></td>
             <td><?php echo htmlspecialchars($task['description']); ?></td>
             <td><?php echo htmlspecialchars($task['due_date']); ?></td>
-            <td><?php echo htmlspecialchars($task['status']); ?></td>
+            <td>
+              <select onchange='updateStatus(<?php echo $task['id']; ?>, this.value)'>
+                <option value="to-do" <?php echo ($task['status'] == 'to-do') ? 'to-do' : ''?>> To-do</option>
+                <option value='on progress' <?php echo ($task["status"]== 'on progress')? 'selected' : ''?>>on progress</option>
+                <option value="complete" <?php echo ($task["status"]== "completed" ) ? "completed" : '' ?>>Completed</option>
+              </select>
+            </td>
             <td><?php echo htmlspecialchars($task['priority']); ?></td>
             <td>
               <a href="edit_task.php?id=<?php echo $task['id']; ?>">Edit</a>
