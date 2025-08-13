@@ -20,10 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $conn->real_escape_string($_POST['title']);
     $description = $conn->real_escape_string($_POST['description']);
     $due_date = $_POST['due_date'];
-    $status = $_POST['status'];
-    $priority = $_POST['priority'];
 
-    $sql = "UPDATE tasks SET title='$title', description='$description', due_date='$due_date', status='$status', priority='$priority' WHERE id=$id";
+    $sql = "UPDATE tasks SET title='$title', description='$description', due_date='$due_date' WHERE id=$id";
     if ($conn->query($sql) === TRUE) {
         header("Location: index.php");
         exit;
@@ -59,7 +57,7 @@ $task = $result->fetch_assoc();
     <textarea name="description"><?php echo htmlspecialchars($task['description']); ?></textarea><br>
 
     <label>Due Date:</label><br>
-    <input type="date" name="due_date" value="<?php echo htmlspecialchars($task['due_date']); ?>"><br>
+    <input type="datetime-local" name="due_date" value="<?php echo htmlspecialchars($task['due_date']); ?>"><br>
 
     <button type="submit">Update Task</button>
   </form>
