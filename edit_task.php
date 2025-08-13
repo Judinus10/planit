@@ -61,19 +61,6 @@ $task = $result->fetch_assoc();
     <label>Due Date:</label><br>
     <input type="date" name="due_date" value="<?php echo htmlspecialchars($task['due_date']); ?>"><br>
 
-    <label>Status:</label><br>
-    <select name="status">
-      <option value="pending" <?php if($task['status'] == 'pending') echo 'selected'; ?>>Pending</option>
-      <option value="completed" <?php if($task['status'] == 'completed') echo 'selected'; ?>>Completed</option>
-    </select><br>
-
-    <label>Priority:</label><br>
-    <select name="priority">
-      <option value="low" <?php if($task['priority'] == 'low') echo 'selected'; ?>>Low</option>
-      <option value="medium" <?php if($task['priority'] == 'medium') echo 'selected'; ?>>Medium</option>
-      <option value="high" <?php if($task['priority'] == 'high') echo 'selected'; ?>>High</option>
-    </select><br><br>
-
     <button type="submit">Update Task</button>
   </form>
   <br>
