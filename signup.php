@@ -1,7 +1,10 @@
 <?php
+session_start();
 require 'db.php';
+require 'send_otp.php'; // Include your PHPMailer setup here
 
 $errors = [];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username']);
     $email = trim($_POST['email']);
@@ -24,15 +27,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($stmt->num_rows > 0) {
             $errors[] = "Username or email already taken";
         } else {
-            // Hash password and insert new user
+            // Hash password (we will save after OTP verification)
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
-            $insert_stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-            $insert_stmt->bind_param('sss', $username, $email, $password_hash);
-            if ($insert_stmt->execute()) {
-                header("Location: login.php?signup=success");
+
+            // Generate OTP
+            $otp = rand(100000, 999999);
+
+            // Save registration data + OTP in session
+            $_SESSION['reg_username'] = $username;
+            $_SESSION['reg_email'] = $email;
+            $_SESSION['reg_password'] = $password_hash;
+            $_SESSION['otp'] = $otp;
+            $_SESSION['otp_time'] = time();
+
+            // Send OTP using PHPMailer from send_otp.php
+            $sent = sendOtpEmail($email, $otp); // A function you create in send_otp.php
+
+            if ($sent) {
+                header("Location: verify_otp.php");
                 exit;
             } else {
-                $errors[] = "Error creating user";
+                $errors[] = "Failed to send OTP email. Please try again.";
             }
         }
     }
