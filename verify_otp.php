@@ -1,7 +1,7 @@
 <?php
 session_start();
 require 'db.php';
-require 'send_otp.php'; // PHPMailer function sendOtpEmail()
+require 'send_email.php'; // PHPMailer function sendOtpEmail()
 
 $errors = [];
 
