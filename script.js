@@ -17,3 +17,17 @@ document.querySelectorAll('.subtask-toggle').forEach(checkbox => {
         });
     });
 });
+
+function updateStatus(taskId, newStatus) {
+    fetch('update_status.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'id=' + taskId + '&status=' + newStatus
+    })
+    .then(res => res.text())
+    .then(data => {
+        console.log(data); // Debugging
+        // alert('Status updated successfully');
+    })
+    .catch(err => console.error(err));
+}
