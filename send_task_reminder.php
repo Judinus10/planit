@@ -1,10 +1,10 @@
 <?php
 session_start();
 require 'db.php';
-require 'send_otp.php';
+require 'send_email.php';
+date_default_timezone_set('Asia/Colombo');
 
 $now = date('Y-m-d H:i:s');
-
 // Select tasks due in next hour for all users, not notified
 $sql = "SELECT t.id, t.title, t.due_date, u.email
         FROM tasks t
@@ -19,9 +19,9 @@ $stmt->bind_param('ss', $now, $oneHourAgo);
 $stmt->execute();
 $result = $stmt->get_result();
 
-var_dump($now, $oneHourAgo); //for debugging
-echo $stmt->error;
-echo $stmt->num_rows; // only works if store_result() is called
+// var_dump($now, $oneHourAgo); //for debugging
+// echo $stmt->error;
+// echo $stmt->num_rows; // only works if store_result() is called
 
 
 while ($task = $result->fetch_assoc()) {
@@ -40,7 +40,5 @@ while ($task = $result->fetch_assoc()) {
     //      echo "❌ Failed to send email to {$email} for task ID {$task['id']}<br>";// for debugging
     // }
 }
-
-// echo "<br><a href='index.php'>⬅ Go back</a>";
 
 ?>
