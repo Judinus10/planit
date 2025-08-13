@@ -1,4 +1,3 @@
-// index.php
 document.querySelectorAll('.subtask-toggle').forEach(checkbox => {
     checkbox.addEventListener('change', () => {
     const subtaskId = checkbox.getAttribute('data-subtask-id');
@@ -45,6 +44,19 @@ function updatePriority(taskId, newPriority) {
     })
     .catch(err => console.error(err));
 }
+
+const toggleBtn = document.getElementById('toggleSubtaskBtn');
+  const formRow = document.getElementById('subtaskFormRow');
+
+  toggleBtn.addEventListener('click', () => {
+    if (formRow.style.display === 'none') {
+      formRow.style.display = 'table-row';
+      toggleBtn.textContent = 'Hide Subtask Form';
+    } else {
+      formRow.style.display = 'none';
+      toggleBtn.textContent = 'Add Subtask';
+    }
+  });
 
 // Countdown timer in JavaScript
 // let timeLeft = <?php echo $time_left; ?>;
