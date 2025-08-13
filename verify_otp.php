@@ -1,14 +1,18 @@
 <?php
 session_start();
 require 'db.php';
+require 'send_otp.php'; // PHPMailer function sendOtpEmail()
 
 $errors = [];
+
+// Make sure a registration is in progress
 if (!isset($_SESSION['otp'], $_SESSION['reg_email'])) {
     echo "No registration in progress.";
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Handle OTP verification
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify'])) {
     $user_otp = trim($_POST['otp']);
 
     // Check OTP expiration (5 minutes)
@@ -21,7 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = $_SESSION['reg_email'];
         $password = $_SESSION['reg_password'];
 
-        $stmt = $conn->prepare("INSERT INTO users (username, email, password, email_verified) VALUES (?, ?, ?, 1)");
+        $stmt = $conn->prepare(
+            "INSERT INTO users (username, email, password, email_verified) VALUES (?, ?, ?, 1)"
+        );
         $stmt->bind_param('sss', $username, $email, $password);
 
         if ($stmt->execute()) {
@@ -37,41 +43,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// Handle resend OTP
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend'])) {
+    $otp = rand(100000, 999999);
+    $_SESSION['otp'] = $otp;
+    $_SESSION['otp_time'] = time();
+
+    if (sendOtpEmail($_SESSION['reg_email'], $otp)) {
+        $errors[] = "A new OTP has been sent to your email.";
+    } else {
+        $errors[] = "Failed to resend OTP. Please try again.";
+    }
+}
+
 // Calculate remaining time for timer
 $time_left = 300 - (time() - $_SESSION['otp_time']);
-$minutes = floor($time_left / 60);
-$seconds = $time_left % 60;
+$time_left = max($time_left, 0);
 ?>
+
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Verify OTP</title>
+    <style>
+        .timer { font-weight: bold; color: red; margin-bottom: 10px; }
+        .errors { color: red; }
+    </style>
 </head>
-
 <body>
-    <h1>Verify OTP</h1>
-    <?php if ($errors): ?>
-        <ul>
-            <?php foreach ($errors as $e)
-                echo "<li>$e</li>"; ?>
-        </ul>
-    <?php endif; ?>
-    <p class="timer" id="timer">Time left: <?php echo sprintf("%02d:%02d", $minutes, $seconds); ?></p>
-    <form method="POST" action="">
-        <label>Enter OTP sent to your email:</label>
-        <input type="text" name="otp" required maxlength="6">
-        <button type="submit">Verify</button>
-    </form>
-</body>
+<h1>Verify OTP</h1>
+
+<?php if ($errors): ?>
+<div class="errors">
+    <ul>
+        <?php foreach ($errors as $e) echo "<li>$e</li>"; ?>
+    </ul>
+</div>
+<?php endif; ?>
+
+<p class="timer" id="timer">Time left: <?php echo sprintf("%02d:%02d", floor($time_left / 60), $time_left % 60); ?></p>
+
+<form method="POST" action="">
+    <label>Enter OTP sent to your email:</label>
+    <input type="text" name="otp" required maxlength="6">
+    <button type="submit" name="verify">Verify</button>
+    <button type="submit" name="resend">Resend OTP</button>
+</form>
+
 <script>
 // Countdown timer in JavaScript
 let timeLeft = <?php echo $time_left; ?>;
 
 function updateTimer() {
     if (timeLeft <= 0) {
-        document.getElementById('timer').innerHTML = "OTP expired. Please register again.";
-        document.querySelector('button[type="submit"]').disabled = true;
+        document.getElementById('timer').innerHTML = "OTP expired. Please resend OTP.";
+        document.querySelector('button[name="verify"]').disabled = true;
         return;
     }
 
@@ -83,5 +109,5 @@ function updateTimer() {
 
 setInterval(updateTimer, 1000);
 </script>
-<!-- <script src="script.js"></script> -->
+</body>
 </html>

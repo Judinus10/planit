@@ -1,4 +1,4 @@
-
+<?php
 // use PHPMailer\PHPMailer\PHPMailer;
 // use PHPMailer\PHPMailer\Exception;
 
@@ -34,8 +34,6 @@
 //     echo "Mailer Error: {$mail->ErrorInfo}";
 // }
 
-
-<?php
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -49,8 +47,8 @@ function sendOtpEmail($recipient_email, $otp) {
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'judinushu@gmail.com';   // sender email
-        $mail->Password   = 'tlcm hmuq lvhv fynw';      // Gmail App password
+        $mail->Username   = 'judinushu@gmail.com';  
+        $mail->Password   = 'tlcm hmuq lvhv fynw';    
         $mail->SMTPSecure = 'tls';
         $mail->Port       = 587;
 
