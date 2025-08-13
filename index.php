@@ -29,6 +29,7 @@ $result = $conn->query($sql);
   <h1>Your Tasks</h1>
 
   <a href="add_task.php">+ Add New Task</a>
+  <a href="add_task.php">+ Add Member</a>
 
   <table>
     <thead>
