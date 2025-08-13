@@ -31,3 +31,17 @@ function updateStatus(taskId, newStatus) {
     })
     .catch(err => console.error(err));
 }
+
+function updatePriority(taskId, newPriority) {
+    fetch('update_priority.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'id=' + taskId + '&priority=' + newPriority
+    })
+    .then(res => res.text())
+    .then(data => {
+        console.log(data); // Debugging
+        // alert('Priority updated successfully');
+    })
+    .catch(err => console.error(err));
+}
