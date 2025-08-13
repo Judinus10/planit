@@ -61,8 +61,8 @@ $result = $conn->query($sql);
             <td>
               <select onchange='updatePriority(<?php echo $task['id']; ?>, this.value)'>
                 <option value="High" <?php echo ($task['priority'] == 'High') ? 'High' : ''?>> High</option>
-                <option value='Low' <?php echo ($task["priority"]== 'Low')? 'Low' : ''?>>Medium</option>
-                <option value="Medium" <?php echo ($task["priority"]== "Medium" ) ? "Medium" : '' ?>>Low</option>
+                <option value="Medium" <?php echo ($task["priority"]== "Medium" ) ? "Medium" : '' ?>>Medium</option>
+                <option value='Low' <?php echo ($task["priority"]== 'Low')? 'Low' : ''?>>Low</option>
               </select>
             </td>
             <td>
