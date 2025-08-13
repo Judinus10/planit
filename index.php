@@ -77,12 +77,13 @@ $result = $conn->query($sql);
               <a href="delete_task.php?id=<?php echo $task['id']; ?>"
                 onclick="return confirm('Delete this task?');">Delete</a>
             </td>
-            <!-- for email debugging -->
-            <!-- <td><form action="send_task_reminder.php" method="POST" style="margin-top:20px;">
-              <button type="submit">📩 Send Notifications</button>
+          <!-- for email debugging -->
+          <!-- <td><form action="send_task_reminder.php" method="POST" style="margin-top:20px;">
+              <button type="submit"> Send Notifications</button>
             </form></td> -->
-            
-
+            <td >
+              <button class="btn" id="toggleSubtaskBtn">Add Subtask</button>
+            </td>
           </tr>
 
           <?php
@@ -112,7 +113,7 @@ $result = $conn->query($sql);
             </tr>
           <?php endif; ?>
 
-          <tr>
+          <!-- <tr>
             <td colspan="7" style="padding-left: 40px; background: #f0eaff;">
               <form method="POST" action="add_subtask.php" style="display: flex; gap: 8px; align-items: center;">
                 <input type="hidden" name="task_id" value="<?php echo $task_id; ?>">
@@ -120,6 +121,19 @@ $result = $conn->query($sql);
                   style="flex-grow: 1; padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc;">
                 <button type="submit"
                   style="background:#7b2ff7; color:white; border:none; padding:6px 14px; border-radius:4px; cursor:pointer;">Add</button>
+              </form>
+            </td>
+          </tr> -->
+          <tr id="subtaskFormRow" style="display: none;">
+            <td colspan="7" style="padding-left: 40px; background: #f0eaff;">
+              <form method="POST" action="add_subtask.php" style="display: flex; gap: 8px; align-items: center;">
+                <input type="hidden" name="task_id" value="<?php echo $task_id; ?>">
+                <input type="text" name="title" placeholder="Add new subtask..." required
+                  style="flex-grow: 1; padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc;">
+                <button type="submit"
+                  style="background:#7b2ff7; color:white; border:none; padding:6px 14px; border-radius:4px; cursor:pointer;">
+                  Add
+                </button>
               </form>
             </td>
           </tr>
