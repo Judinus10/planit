@@ -45,12 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <label>Due Date:</label><br>
     <input type="date" name="due_date"><br>
 
-    <label>Status:</label><br>
-    <select name="status">
-      <option value="pending">Pending</option>
-      <option value="completed">Completed</option>
-    </select><br>
-
     <label>Priority:</label><br>
     <select name="priority">
       <option value="low">Low</option>
