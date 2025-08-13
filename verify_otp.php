@@ -85,7 +85,7 @@ $time_left = max($time_left, 0);
 
 <form method="POST" action="">
     <label>Enter OTP sent to your email:</label>
-    <input type="text" name="otp" required maxlength="6">
+    <input type="text" name="otp" maxlength="6">
     <button type="submit" name="verify">Verify</button>
     <button type="submit" name="resend">Resend OTP</button>
 </form>

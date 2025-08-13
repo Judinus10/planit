@@ -68,5 +68,32 @@ function sendOtpEmail($recipient_email, $otp) {
         return false;
     }
 }
+
+function sendEmail($to, $body, $subject = "Task Reminder") {
+    $mail = new PHPMailer(true);
+
+    try {
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'judinushu@gmail.com';   
+        $mail->Password   = 'tlcm hmuq lvhv fynw';      
+        $mail->SMTPSecure = 'tls';
+        $mail->Port       = 587;
+
+        $mail->setFrom('judinushu@gmail.com', 'Task Manager');
+        $mail->addAddress($to);
+
+        $mail->isHTML(false);
+        $mail->Subject = $subject;
+        $mail->Body    = $body;
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("Mailer Error: {$mail->ErrorInfo}");
+        return false;
+    }
+}
 ?>
 
