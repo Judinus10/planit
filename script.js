@@ -19,7 +19,7 @@ document.querySelectorAll('.subtask-toggle').forEach(checkbox => {
 });
 
 function updateStatus(taskId, newStatus) {
-    fetch('update_status.php', {
+    fetch('update.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: 'id=' + taskId + '&status=' + newStatus
@@ -33,7 +33,7 @@ function updateStatus(taskId, newStatus) {
 }
 
 function updatePriority(taskId, newPriority) {
-    fetch('update_priority.php', {
+    fetch('update.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: 'id=' + taskId + '&priority=' + newPriority
