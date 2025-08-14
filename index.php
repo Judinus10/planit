@@ -30,6 +30,8 @@ $result = $conn->query($sql);
 
     <h1>Your Tasks</h1>
 
+    <a href="notification.php" style="margin-right:10px;">
+            Notifications</a>
     <a href="add_task.php">+ Add New Task</a>
     <a href="collab.php">+ Add Member</a>
 
