@@ -77,6 +77,8 @@ $projects_result = $conn->query("SELECT * FROM projects WHERE created_by=$user_i
         <p>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?> | <a href="logout.php">Logout</a></p>
     </div>
 
+    <a href="notification.php" style="margin-right:10px;">Notifications</a>
+    
     <h1>My Projects</h1>
 
     <?php if ($message)
