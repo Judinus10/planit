@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <textarea name="description"></textarea><br>
 
     <label>Due Date:</label><br>
-    <input type="datetime-local" name="due_date" required><br>
+    <input type="datetime-local" name="datetime-local" required><br>
     <!-- <input type="date" name="due_date"><br> -->
 
     <label>Assigned to : </label><br>
@@ -64,7 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <button type="submit">Add Task</button>
   </form>
   <br>
-  <a href="index.php">Back to Task List</a>
 </body>
 
 </html>
