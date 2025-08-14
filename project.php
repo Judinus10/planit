@@ -77,7 +77,7 @@ $projects_result = $conn->query("SELECT * FROM projects WHERE created_by=$user_i
 <?php if($message) echo "<p class='success'>$message</p>"; ?>
 
 <!-- Create Project Form -->
-<div class="section">
+<div class="section1">
     <h2>Create New Project</h2>
     <form method="POST">
         <label>Project Name:</label>
@@ -89,7 +89,7 @@ $projects_result = $conn->query("SELECT * FROM projects WHERE created_by=$user_i
 </div>
 
 <!-- Projects Table -->
-<div class="section">
+<div class="section1">
     <h2>Your Projects</h2>
     <?php if ($projects_result->num_rows == 0): ?>
         <p>No projects yet.</p>
@@ -100,18 +100,17 @@ $projects_result = $conn->query("SELECT * FROM projects WHERE created_by=$user_i
                     <th>Name</th>
                     <th>Description</th>
                     <th>Created At</th>
-                    <th colspan="3" style="text-align:center;">Actions</th>
+                    <th colspan="2" style="text-align:center;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php while ($project = $projects_result->fetch_assoc()): ?>
-                    <tr>
+                    <tr class="clickable-row" data-href="index.php?project_id=<?php echo $project['id']; ?>">
                         <td><?php echo htmlspecialchars($project['name']); ?></td>
                         <td><?php echo htmlspecialchars($project['description']); ?></td>
                         <td><?php echo htmlspecialchars($project['created_at']); ?></td>
-                        <td><a href="edit_project.php?id=<?php echo $project['id']; ?>">Edit</a></td>
-                        <td><a href="projects.php?delete=<?php echo $project['id']; ?>" onclick="return confirm('Delete this project?')">Delete</a></td>
-                        <td><a href="collab.php?project_id=<?php echo $project['id']; ?>">Manage Members</a></td>
+                        <td><a href="projects.php?delete=<?php echo $project['id']; ?>" onclick="event.stopPropagation(); return confirm('Delete this project?')">Delete</a></td>
+                        <td><a href="collab.php?project_id=<?php echo $project['id']; ?>" onclick="event.stopPropagation();">Manage Members</a></td>
                     </tr>
                 <?php endwhile; ?>
             </tbody>
@@ -119,5 +118,17 @@ $projects_result = $conn->query("SELECT * FROM projects WHERE created_by=$user_i
     <?php endif; ?>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const rows = document.querySelectorAll('.clickable-row');
+        rows.forEach(row => {
+            row.addEventListener('click', () => {
+                window.location.href = row.dataset.href;
+            });
+        });
+    });
+</script>
+
+<script src="script.js"></script>
 </body>
 </html>
