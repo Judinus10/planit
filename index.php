@@ -24,6 +24,9 @@ $result = $conn->query($sql);
 </head>
 
 <body>
+  <a href="javascript:history.back()" class="back-button">
+    &#8592; Back
+  </a>
     <div class="top-right">
       <p>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?> | <a href="logout.php">Logout</a></p>
     </div>
