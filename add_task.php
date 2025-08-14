@@ -2,8 +2,8 @@
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
-  header("Location: login.php");
-  exit;
+    header("Location: login.php");
+    exit;
 }
 
 require 'db.php';
@@ -11,13 +11,19 @@ require 'db.php';
 $user_id = $_SESSION['user_id'];
 $project_id = isset($_GET['project_id']) ? (int)$_GET['project_id'] : 0;
 
-// Fetch project members to assign tasks
+// Fetch project members + creator for dropdown
 $members = [];
 if ($project_id) {
-    $stmt = $conn->prepare("SELECT u.id, u.username FROM users u
-                            JOIN project_members pm ON u.id = pm.user_id
-                            WHERE pm.project_id = ?");
-    $stmt->bind_param("i", $project_id);
+    $stmt = $conn->prepare("
+        SELECT u.id, u.username 
+        FROM users u
+        WHERE u.id IN (
+            SELECT user_id FROM project_members WHERE project_id = ?
+            UNION 
+            SELECT created_by FROM projects WHERE id = ?
+        )
+    ");
+    $stmt->bind_param("ii", $project_id, $project_id);
     $stmt->execute();
     $result = $stmt->get_result();
     while ($row = $result->fetch_assoc()) {
@@ -30,10 +36,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $description = $conn->real_escape_string($_POST['description']);
     $due_date = $_POST['due_date'];
     $priority = $_POST['priority'];
-    $assigned_to = isset($_POST['assigned_to']) ? (int)$_POST['assigned_to'] : $user_id;
+    $assigned_to = isset($_POST['assigned_to']) ? (int)$_POST['assigned_to'] : NULL;
 
-    $sql = "INSERT INTO tasks (title, description, due_date, status, priority, user_id, project_id)
-            VALUES ('$title', '$description', '$due_date', 'To-do', '$priority', $assigned_to, $project_id)";
+    $sql = "INSERT INTO tasks (title, description, due_date, status, priority, user_id, project_id, assigned_to)
+            VALUES ('$title', '$description', '$due_date', 'To-do', '$priority', $user_id, $project_id, " . ($assigned_to ?: "NULL") . ")";
 
     if ($conn->query($sql) === TRUE) {
         header("Location: index.php?project_id=$project_id");
@@ -47,38 +53,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Add Task</title>
-  <link rel="stylesheet" href="style.css">
+    <title>Add Task</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <a href="javascript:history.back()" class="back-button">&#8592; Back</a>
-  <h1>Add New Task</h1>
+    <a href="javascript:history.back()" class="back-button">&#8592; Back</a>
+    <h1>Add New Task</h1>
 
-  <form method="POST" action="">
-    <label>Title:</label><br>
-    <input type="text" name="title" required><br>
+    <form method="POST" action="">
+        <label>Title:</label><br>
+        <input type="text" name="title" required><br>
 
-    <label>Description:</label><br>
-    <textarea name="description"></textarea><br>
+        <label>Description:</label><br>
+        <textarea name="description"></textarea><br>
 
-    <label>Due Date:</label><br>
-    <input type="datetime-local" name="due_date" required><br>
+        <label>Due Date:</label><br>
+        <input type="datetime-local" name="due_date" required><br>
 
-    <label>Assign to:</label><br>
-    <select name="assigned_to">
-      <?php foreach ($members as $member): ?>
-        <option value="<?php echo $member['id']; ?>"><?php echo htmlspecialchars($member['username']); ?></option>
-      <?php endforeach; ?>
-    </select><br><br>
+        <label>Assign to:</label><br>
+        <select name="assigned_to">
+            <option value="">-- Unassigned --</option>
+            <?php foreach ($members as $member): ?>
+                <option value="<?php echo $member['id']; ?>">
+                    <?php echo htmlspecialchars($member['username']); ?>
+                </option>
+            <?php endforeach; ?>
+        </select><br><br>
 
-    <label>Priority:</label><br>
-    <select name="priority">
-      <option value="Low">Low</option>
-      <option value="Medium" selected>Medium</option>
-      <option value="High">High</option>
-    </select><br><br>
+        <label>Priority:</label><br>
+        <select name="priority">
+            <option value="Low">Low</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="High">High</option>
+        </select><br><br>
 
-    <button type="submit">Add Task</button>
-  </form>
+        <button type="submit">Add Task</button>
+    </form>
 </body>
 </html>
