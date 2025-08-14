@@ -239,6 +239,107 @@ form button:hover {
   margin-bottom: 20px;
 }
 
+/* Buttons for actions */
+.actions {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.actions button {
+  background-color: #7b2ff7;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 0 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.actions button:hover {
+  background-color: #5f22d1;
+}
+
+/* Sections for forms */
+.section {
+  background: white;
+  padding: 25px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgb(123 47 247 / 0.1);
+  max-width: 500px;
+  margin: 0 auto 40px;
+  display: none; /* hidden by default */
+}
+
+.section label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #240046;
+  font-size: 1rem;
+}
+
+.section input[type="text"],
+.section input[type="email"],
+.section select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1.8px solid #d3c0fc;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #5f22d1;
+  transition: border-color 0.3s ease;
+  margin-bottom: 15px;
+  font-family: inherit;
+}
+
+.section input[type="text"]:focus,
+.section input[type="email"]:focus,
+.section select:focus {
+  outline: none;
+  border-color: #7b2ff7;
+  box-shadow: 0 0 8px #b794f4;
+}
+
+.section button {
+  background-color: #7b2ff7;
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.section button:hover {
+  background-color: #5f22d1;
+}
+
+/* Messages */
+.success {
+  background-color: #d1e7dd;
+  color: #0f5132;
+  border-radius: 6px;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.errors {
+  background-color: #f8d7da;
+  color: #842029;
+  border-radius: 6px;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+
 /* Responsive */
 @media (max-width: 600px) {
   body {
@@ -281,5 +382,15 @@ form button:hover {
 
   tbody td a {
     margin-right: 6px;
+  }
+
+  .section {
+    padding: 20px 15px;
+  }
+
+  .actions button {
+    display: block;
+    width: 80%;
+    margin: 10px auto;
   }
 }
