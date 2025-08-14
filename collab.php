@@ -10,14 +10,28 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $message = "";
 
+// Check project ownership function
+function isProjectOwner($conn, $project_id, $user_id) {
+    $stmt = $conn->prepare("SELECT created_by FROM projects WHERE id=?");
+    $stmt->bind_param("i", $project_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows === 0) return false;
+    $project = $result->fetch_assoc();
+    return $project['created_by'] == $user_id;
+}
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $project_id = (int) $_POST['project_id'];
 
-    // Invite via email (for non-registered users)
+    if (!isProjectOwner($conn, $project_id, $user_id)) {
+        die("You are not the owner. Only the project owner can invite users.");
+    }
+
+    // Invite via email
     if (isset($_POST['invite_email'])) {
-        $project_id = (int) $_POST['project_id'];
         $invite_email = trim($_POST['invite_email']);
-
         if (!empty($invite_email)) {
             $stmt = $conn->prepare("INSERT INTO invitations (project_id, email, invited_by) VALUES (?, ?, ?)");
             $stmt->bind_param("isi", $project_id, $invite_email, $user_id);
@@ -32,9 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Invite existing user (send notification)
+    // Invite existing user
     if (isset($_POST['add_member'])) {
-        $project_id = (int) $_POST['project_id'];
         $member_id = (int) $_POST['member_id'];
 
         // Check if user is already a member
@@ -44,7 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $check->store_result();
 
         if ($check->num_rows === 0) {
-            // Send notification instead of adding directly
             $project_stmt = $conn->prepare("SELECT name FROM projects WHERE id=?");
             $project_stmt->bind_param("i", $project_id);
             $project_stmt->execute();
@@ -65,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch all projects created by current user
+// Fetch all projects created by current user (owners only)
 $projects_result = $conn->query("SELECT id, name FROM projects WHERE created_by=$user_id");
 
 // Fetch all users except current
@@ -84,45 +96,49 @@ $users_result = $conn->query("SELECT id, username FROM users WHERE id != $user_i
 <h1>Collaborate on Projects</h1>
 <?php if ($message) echo "<p class='success'>$message</p>"; ?>
 
-<div class="actions">
-    <button id="inviteBtn">Invite User (Email)</button>
-    <button id="addBtn">Invite Existing User</button>
-</div>
+<?php if ($projects_result->num_rows === 0): ?>
+    <p>You are not the owner of any project. Only project owners can invite users.</p>
+<?php else: ?>
+    <div class="actions">
+        <button id="inviteBtn">Invite User (Email)</button>
+        <button id="addBtn">Invite Existing User</button>
+    </div>
 
-<!-- Invite via Email -->
-<div class="section" id="inviteSection" style="display:none;">
-    <form method="POST">
-        <label>Select Project:</label>
-        <select name="project_id" required>
-            <?php while ($project = $projects_result->fetch_assoc()): ?>
-                <option value="<?php echo $project['id']; ?>"><?php echo htmlspecialchars($project['name']); ?></option>
-            <?php endwhile; ?>
-        </select><br>
-        <label>Email:</label>
-        <input type="email" name="invite_email" placeholder="Enter email" required>
-        <button type="submit">Send Invitation</button>
-    </form>
-</div>
+    <!-- Invite via Email -->
+    <div class="section" id="inviteSection" style="display:none;">
+        <form method="POST">
+            <label>Select Project:</label>
+            <select name="project_id" required>
+                <?php while ($project = $projects_result->fetch_assoc()): ?>
+                    <option value="<?php echo $project['id']; ?>"><?php echo htmlspecialchars($project['name']); ?></option>
+                <?php endwhile; ?>
+            </select><br>
+            <label>Email:</label>
+            <input type="email" name="invite_email" placeholder="Enter email" required>
+            <button type="submit">Send Invitation</button>
+        </form>
+    </div>
 
-<!-- Invite existing user -->
-<div class="section" id="addSection" style="display:none;">
-    <form method="POST">
-        <label>Select Project:</label>
-        <select name="project_id" required>
-            <?php $projects_result->data_seek(0); ?>
-            <?php while ($project = $projects_result->fetch_assoc()): ?>
-                <option value="<?php echo $project['id']; ?>"><?php echo htmlspecialchars($project['name']); ?></option>
-            <?php endwhile; ?>
-        </select><br>
-        <label>Select User:</label>
-        <select name="member_id" required>
-            <?php while ($user = $users_result->fetch_assoc()): ?>
-                <option value="<?php echo $user['id']; ?>"><?php echo htmlspecialchars($user['username']); ?></option>
-            <?php endwhile; ?>
-        </select>
-        <button type="submit" name="add_member">Send Invitation</button>
-    </form>
-</div>
+    <!-- Invite existing user -->
+    <div class="section" id="addSection" style="display:none;">
+        <form method="POST">
+            <label>Select Project:</label>
+            <select name="project_id" required>
+                <?php $projects_result->data_seek(0); ?>
+                <?php while ($project = $projects_result->fetch_assoc()): ?>
+                    <option value="<?php echo $project['id']; ?>"><?php echo htmlspecialchars($project['name']); ?></option>
+                <?php endwhile; ?>
+            </select><br>
+            <label>Select User:</label>
+            <select name="member_id" required>
+                <?php while ($user = $users_result->fetch_assoc()): ?>
+                    <option value="<?php echo $user['id']; ?>"><?php echo htmlspecialchars($user['username']); ?></option>
+                <?php endwhile; ?>
+            </select>
+            <button type="submit" name="add_member">Send Invitation</button>
+        </form>
+    </div>
+<?php endif; ?>
 
 <script>
     const inviteBtn = document.getElementById('inviteBtn');
