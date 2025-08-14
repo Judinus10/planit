@@ -16,7 +16,6 @@ $project_id = isset($_GET['project_id']) ? (int)$_GET['project_id'] : 0;
 // Fetch project info
 $project_name = "All Tasks";
 if ($project_id) {
-    // Check if the user is either the creator or a member of the project
     $stmt = $conn->prepare("
         SELECT name 
         FROM projects 
@@ -32,23 +31,27 @@ if ($project_id) {
         $project = $result->fetch_assoc();
         $project_name = htmlspecialchars($project['name']);
     } else {
-        $project_id = 0; // invalid project, fallback
+        $project_id = 0;
     }
 }
 
-// Fetch tasks for this project (with assigned user's name)
+// Fetch tasks (completed last, others by due date)
 if ($project_id) {
     $sql = "SELECT t.*, u.username AS assigned_user 
             FROM tasks t
             LEFT JOIN users u ON t.assigned_to = u.id
             WHERE t.project_id = $project_id 
-            ORDER BY t.due_date ASC";
+            ORDER BY 
+                CASE WHEN t.status = 'completed' THEN 1 ELSE 0 END,
+                t.due_date ASC";
 } else {
     $sql = "SELECT t.*, u.username AS assigned_user
             FROM tasks t
             LEFT JOIN users u ON t.assigned_to = u.id
             WHERE t.user_id = $user_id 
-            ORDER BY t.due_date ASC";
+            ORDER BY 
+                CASE WHEN t.status = 'completed' THEN 1 ELSE 0 END,
+                t.due_date ASC";
 }
 $result = $conn->query($sql);
 ?>
@@ -58,6 +61,11 @@ $result = $conn->query($sql);
 <head>
     <title><?php echo $project_name; ?> - Tasks</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .completed-task {
+            opacity: 0.6;
+        }
+    </style>
 </head>
 <body>
     <a href="javascript:history.back()" class="back-button">&#8592; Back</a>
@@ -78,7 +86,7 @@ $result = $conn->query($sql);
                 <th>Title</th>
                 <th>Description</th>
                 <th>Due Date</th>
-                <th>Assigned To</th> <!-- New column -->
+                <th>Assigned To</th>
                 <th>Status</th>
                 <th>Priority</th>
                 <th colspan="3" style="text-align: center;">Actions</th>
@@ -91,23 +99,23 @@ $result = $conn->query($sql);
                 </tr>
             <?php else: ?>
                 <?php while ($task = $result->fetch_assoc()): ?>
-                    <tr>
+                    <tr class="<?php echo ($task['status'] == 'completed') ? 'completed-task' : ''; ?>">
                         <td><?php echo htmlspecialchars($task['title']); ?></td>
                         <td><?php echo htmlspecialchars($task['description']); ?></td>
                         <td><?php echo htmlspecialchars($task['due_date']); ?></td>
-                        <td><?php echo htmlspecialchars($task['assigned_user'] ?? 'Unassigned'); ?></td> <!-- Assigned user -->
+                        <td><?php echo htmlspecialchars($task['assigned_user'] ?? 'Unassigned'); ?></td>
                         <td>
-                            <select onchange='updateStatus(<?php echo $task['id']; ?>, this.value)'>
+                            <select onchange="updateStatus(<?php echo $task['id']; ?>, this.value, this.closest('tr'))">
                                 <option value="To-do" <?php echo ($task['status'] == 'To-do') ? 'selected' : '' ?>>To-do</option>
-                                <option value='on-progress' <?php echo ($task["status"] == 'on-progress') ? 'selected' : '' ?>>On-progress</option>
-                                <option value="completed" <?php echo ($task["status"] == "completed") ? "selected" : '' ?>>Completed</option>
+                                <option value="on-progress" <?php echo ($task['status'] == 'on-progress') ? 'selected' : '' ?>>On-progress</option>
+                                <option value="completed" <?php echo ($task['status'] == 'completed') ? 'selected' : '' ?>>Completed</option>
                             </select>
                         </td>
                         <td>
                             <select onchange='updatePriority(<?php echo $task['id']; ?>, this.value)'>
                                 <option value="High" <?php echo ($task['priority'] == 'High') ? 'selected' : '' ?>>High</option>
-                                <option value="Medium" <?php echo ($task["priority"] == 'Medium') ? 'selected' : '' ?>>Medium</option>
-                                <option value='Low' <?php echo ($task["priority"] == 'Low') ? 'selected' : '' ?>>Low</option>
+                                <option value="Medium" <?php echo ($task['priority'] == 'Medium') ? 'selected' : '' ?>>Medium</option>
+                                <option value="Low" <?php echo ($task['priority'] == 'Low') ? 'selected' : '' ?>>Low</option>
                             </select>
                         </td>
                         <td><a href="edit_task.php?id=<?php echo $task['id']; ?>">Edit</a></td>
@@ -116,7 +124,6 @@ $result = $conn->query($sql);
                     </tr>
 
                     <?php
-                    // Fetch subtasks for this task
                     $task_id = $task['id'];
                     $subtask_sql = "SELECT * FROM subtasks WHERE task_id = $task_id ORDER BY created_at ASC";
                     $subtask_result = $conn->query($subtask_sql);
@@ -145,6 +152,49 @@ $result = $conn->query($sql);
             <?php endif; ?>
         </tbody>
     </table>
+
+<script>
+function updateStatus(taskId, newStatus, rowElement) {
+    fetch('update_status.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `id=${taskId}&status=${encodeURIComponent(newStatus)}`
+    })
+    .then(response => response.text())
+    .then(() => {
+        let tbody = rowElement.parentElement;
+
+        if (newStatus === 'completed') {
+            rowElement.classList.add('completed-task');
+            tbody.appendChild(rowElement); // move to bottom
+        } else {
+            rowElement.classList.remove('completed-task');
+            let dueDate = new Date(rowElement.cells[2].innerText);
+            let rows = Array.from(tbody.querySelectorAll('tr'))
+                .filter(r => !r.classList.contains('completed-task') && r.querySelector('select'))
+                .sort((a, b) => new Date(a.cells[2].innerText) - new Date(b.cells[2].innerText));
+
+            // Reinsert row in correct place
+            let inserted = false;
+            for (let r of rows) {
+                if (dueDate < new Date(r.cells[2].innerText)) {
+                    tbody.insertBefore(rowElement, r);
+                    inserted = true;
+                    break;
+                }
+            }
+            if (!inserted) {
+                let firstCompleted = tbody.querySelector('.completed-task');
+                if (firstCompleted) {
+                    tbody.insertBefore(rowElement, firstCompleted);
+                } else {
+                    tbody.appendChild(rowElement);
+                }
+            }
+        }
+    });
+}
+</script>
 
 <script src="script.js"></script>
 </body>
