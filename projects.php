@@ -60,8 +60,15 @@ if (isset($_GET['delete'])) {
     $message = "Project deleted successfully.";
 }
 
-// Fetch projects created by user
-$projects_result = $conn->query("SELECT * FROM projects WHERE created_by=$user_id ORDER BY created_at DESC");
+// Fetch projects created by user or the member
+$projects_result = $conn->query("
+    SELECT DISTINCT p.* 
+    FROM projects p
+    LEFT JOIN project_members pm ON p.id = pm.project_id
+    WHERE p.created_by = $user_id OR pm.user_id = $user_id
+    ORDER BY p.created_at DESC
+");
+
 ?>
 
 <!DOCTYPE html>
@@ -78,7 +85,7 @@ $projects_result = $conn->query("SELECT * FROM projects WHERE created_by=$user_i
     </div>
 
     <a href="notification.php" style="margin-right:10px;">Notifications</a>
-    
+
     <h1>My Projects</h1>
 
     <?php if ($message)
@@ -108,6 +115,7 @@ $projects_result = $conn->query("SELECT * FROM projects WHERE created_by=$user_i
                         <th>Name</th>
                         <th>Description</th>
                         <th>Created At</th>
+                        <th>Role</th>
                         <th colspan="2" style="text-align:center;">Actions</th>
                     </tr>
                 </thead>
@@ -117,6 +125,9 @@ $projects_result = $conn->query("SELECT * FROM projects WHERE created_by=$user_i
                             <td><?php echo htmlspecialchars($project['name']); ?></td>
                             <td><?php echo htmlspecialchars($project['description']); ?></td>
                             <td><?php echo htmlspecialchars($project['created_at']); ?></td>
+                            <td>
+                                <?php echo ($project['created_by'] == $user_id) ? 'Owner' : 'Member'; ?>
+                            </td>
                             <td><a href="projects.php?delete=<?php echo $project['id']; ?>"
                                     onclick="event.stopPropagation(); return confirm('Delete this project?')">Delete</a></td>
                             <td><a href="collab.php?project_id=<?php echo $project['id']; ?>"
