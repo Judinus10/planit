@@ -1,7 +1,7 @@
 <?php
 session_start();
 require 'db.php';
-require 'send_otp.php'; // Include your PHPMailer setup here
+require 'send_email.php'; // Include your PHPMailer setup here
 
 $errors = [];
 
