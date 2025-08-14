@@ -8,37 +8,52 @@ if (!isset($_SESSION['user_id'])) {
 
 require 'db.php';
 
+$user_id = $_SESSION['user_id'];
+$project_id = isset($_GET['project_id']) ? (int)$_GET['project_id'] : 0;
+
+// Fetch project members to assign tasks
+$members = [];
+if ($project_id) {
+    $stmt = $conn->prepare("SELECT u.id, u.username FROM users u
+                            JOIN project_members pm ON u.id = pm.user_id
+                            WHERE pm.project_id = ?");
+    $stmt->bind_param("i", $project_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while ($row = $result->fetch_assoc()) {
+        $members[] = $row;
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $title = $conn->real_escape_string($_POST['title']);
-  $description = $conn->real_escape_string($_POST['description']);
-  $due_date = $_POST['due_date'];
-  $priority = $_POST['priority'];
+    $title = $conn->real_escape_string($_POST['title']);
+    $description = $conn->real_escape_string($_POST['description']);
+    $due_date = $_POST['due_date'];
+    $priority = $_POST['priority'];
+    $assigned_to = isset($_POST['assigned_to']) ? (int)$_POST['assigned_to'] : $user_id;
 
-  $user_id = $_SESSION['user_id'];
-  $sql = "INSERT INTO tasks (title, description, due_date, status, priority, user_id) VALUES ('$title', '$description', '$due_date', 'To-do', '$priority', $user_id)";
+    $sql = "INSERT INTO tasks (title, description, due_date, status, priority, user_id, project_id)
+            VALUES ('$title', '$description', '$due_date', 'To-do', '$priority', $assigned_to, $project_id)";
 
-  if ($conn->query($sql) === TRUE) {
-    header("Location: index.php");
-    exit;
-  } else {
-    echo "Error: " . $conn->error;
-  }
+    if ($conn->query($sql) === TRUE) {
+        header("Location: index.php?project_id=$project_id");
+        exit;
+    } else {
+        echo "Error: " . $conn->error;
+    }
 }
 ?>
 
 <!DOCTYPE html>
 <html>
-
 <head>
   <title>Add Task</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-  <a href="javascript:history.back()" class="back-button">
-    &#8592; Back
-  </a>
+  <a href="javascript:history.back()" class="back-button">&#8592; Back</a>
   <h1>Add New Task</h1>
+
   <form method="POST" action="">
     <label>Title:</label><br>
     <input type="text" name="title" required><br>
@@ -47,23 +62,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <textarea name="description"></textarea><br>
 
     <label>Due Date:</label><br>
-    <input type="datetime-local" name="datetime-local" required><br>
-    <!-- <input type="date" name="due_date"><br> -->
+    <input type="datetime-local" name="due_date" required><br>
 
-    <label>Assigned to : </label><br>
+    <label>Assign to:</label><br>
     <select name="assigned_to">
+      <?php foreach ($members as $member): ?>
+        <option value="<?php echo $member['id']; ?>"><?php echo htmlspecialchars($member['username']); ?></option>
+      <?php endforeach; ?>
     </select><br><br>
 
     <label>Priority:</label><br>
     <select name="priority">
-      <option value="low">Low</option>
-      <option value="medium" selected>Medium</option>
-      <option value="high">High</option>
+      <option value="Low">Low</option>
+      <option value="Medium" selected>Medium</option>
+      <option value="High">High</option>
     </select><br><br>
 
     <button type="submit">Add Task</button>
   </form>
-  <br>
 </body>
-
 </html>

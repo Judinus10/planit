@@ -13,7 +13,7 @@ $message = "";
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // Invite via email
+    // Invite via email (for non-registered users)
     if (isset($_POST['invite_email'])) {
         $project_id = (int) $_POST['project_id'];
         $invite_email = trim($_POST['invite_email']);
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Add existing user to project
+    // Invite existing user (send notification)
     if (isset($_POST['add_member'])) {
         $project_id = (int) $_POST['project_id'];
         $member_id = (int) $_POST['member_id'];
@@ -44,11 +44,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $check->store_result();
 
         if ($check->num_rows === 0) {
-            $stmt = $conn->prepare("INSERT INTO project_members (project_id, user_id) VALUES (?, ?)");
-            $stmt->bind_param("ii", $project_id, $member_id);
-            $stmt->execute();
+            // Send notification instead of adding directly
+            $project_stmt = $conn->prepare("SELECT name FROM projects WHERE id=?");
+            $project_stmt->bind_param("i", $project_id);
+            $project_stmt->execute();
+            $project_stmt->bind_result($project_name);
+            $project_stmt->fetch();
+            $project_stmt->close();
 
-            $message = "User added to the project successfully.";
+            $notif_stmt = $conn->prepare("INSERT INTO notifications (user_id, message, project_id, type, created_at) VALUES (?, ?, ?, 'project_invite', NOW())");
+            $msg = "You are invited to join the project '$project_name'.";
+            $notif_stmt->bind_param("isi", $member_id, $msg, $project_id);
+            $notif_stmt->execute();
+            $notif_stmt->close();
+
+            $message = "Invitation sent to user successfully.";
         } else {
             $message = "User is already a member of this project.";
         }
@@ -64,80 +74,72 @@ $users_result = $conn->query("SELECT id, username FROM users WHERE id != $user_i
 
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Collaborate on Projects</title>
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-    <a href="javascript:history.back()" class="back-button">
-        &#8592; Back
-    </a>
+<a href="javascript:history.back()" class="back-button">&#8592; Back</a>
 
-    <h1>Collaborate on Projects</h1>
+<h1>Collaborate on Projects</h1>
+<?php if ($message) echo "<p class='success'>$message</p>"; ?>
 
-    <?php if ($message)
-        echo "<p class='success'>$message</p>"; ?>
+<div class="actions">
+    <button id="inviteBtn">Invite User (Email)</button>
+    <button id="addBtn">Invite Existing User</button>
+</div>
 
-    <div class="actions">
-        <button id="inviteBtn">Invite User (Email)</button>
-        <button id="addBtn">Add Existing User</button>
-    </div>
+<!-- Invite via Email -->
+<div class="section" id="inviteSection" style="display:none;">
+    <form method="POST">
+        <label>Select Project:</label>
+        <select name="project_id" required>
+            <?php while ($project = $projects_result->fetch_assoc()): ?>
+                <option value="<?php echo $project['id']; ?>"><?php echo htmlspecialchars($project['name']); ?></option>
+            <?php endwhile; ?>
+        </select><br>
+        <label>Email:</label>
+        <input type="email" name="invite_email" placeholder="Enter email" required>
+        <button type="submit">Send Invitation</button>
+    </form>
+</div>
 
-    <!-- Invite via Email -->
-    <div class="section" id="inviteSection">
-        <form method="POST">
-            <label>Select Project:</label>
-            <select name="project_id" required>
-                <?php while ($project = $projects_result->fetch_assoc()): ?>
-                    <option value="<?php echo $project['id']; ?>"><?php echo htmlspecialchars($project['name']); ?></option>
-                <?php endwhile; ?>
-            </select><br>
-            <label>Email:</label>
-            <input type="email" name="invite_email" placeholder="Enter email" required>
-            <button type="submit">Send Invitation</button>
-        </form>
-    </div>
+<!-- Invite existing user -->
+<div class="section" id="addSection" style="display:none;">
+    <form method="POST">
+        <label>Select Project:</label>
+        <select name="project_id" required>
+            <?php $projects_result->data_seek(0); ?>
+            <?php while ($project = $projects_result->fetch_assoc()): ?>
+                <option value="<?php echo $project['id']; ?>"><?php echo htmlspecialchars($project['name']); ?></option>
+            <?php endwhile; ?>
+        </select><br>
+        <label>Select User:</label>
+        <select name="member_id" required>
+            <?php while ($user = $users_result->fetch_assoc()): ?>
+                <option value="<?php echo $user['id']; ?>"><?php echo htmlspecialchars($user['username']); ?></option>
+            <?php endwhile; ?>
+        </select>
+        <button type="submit" name="add_member">Send Invitation</button>
+    </form>
+</div>
 
-    <!-- Add existing user to project -->
-    <div class="section" id="addSection">
-        <form method="POST">
-            <label>Select Project:</label>
-            <select name="project_id" required>
-                <?php
-                $projects_result->data_seek(0);
-                while ($project = $projects_result->fetch_assoc()): ?>
-                    <option value="<?php echo $project['id']; ?>"><?php echo htmlspecialchars($project['name']); ?></option>
-                <?php endwhile; ?>
-            </select><br>
-            <label>Select User:</label>
-            <select name="member_id" required>
-                <?php while ($user = $users_result->fetch_assoc()): ?>
-                    <option value="<?php echo $user['id']; ?>"><?php echo htmlspecialchars($user['username']); ?></option>
-                <?php endwhile; ?>
-            </select>
-            <button type="submit" name="add_member">Add to Project</button>
-        </form>
-    </div>
+<script>
+    const inviteBtn = document.getElementById('inviteBtn');
+    const addBtn = document.getElementById('addBtn');
+    const inviteSection = document.getElementById('inviteSection');
+    const addSection = document.getElementById('addSection');
 
-    <script>
-        const inviteBtn = document.getElementById('inviteBtn');
-        const addBtn = document.getElementById('addBtn');
-        const inviteSection = document.getElementById('inviteSection');
-        const addSection = document.getElementById('addSection');
+    inviteBtn.addEventListener('click', () => {
+        inviteSection.style.display = 'block';
+        addSection.style.display = 'none';
+    });
 
-        inviteBtn.addEventListener('click', () => {
-            inviteSection.style.display = 'block';
-            addSection.style.display = 'none';
-        });
-
-        addBtn.addEventListener('click', () => {
-            addSection.style.display = 'block';
-            inviteSection.style.display = 'none';
-        });
-    </script>
+    addBtn.addEventListener('click', () => {
+        addSection.style.display = 'block';
+        inviteSection.style.display = 'none';
+    });
+</script>
 
 </body>
-
 </html>

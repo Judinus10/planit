@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Password is correct
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $username;
-                header("Location: project.php");
+                header("Location: projects.php");
                 exit;
             } else {
                 $errors[] = "Incorrect password";
