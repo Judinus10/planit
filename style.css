@@ -8,19 +8,40 @@
 
 /* Body styling */
 body {
-  background-color: #f5f3ff; /* light lavender */
-  color: #3c096c; /* dark violet */
-  max-width: 900px;
-  margin: 40px auto;
-  padding: 20px;
+  background-color: #f5f3ff;
+  /* light lavender */
+  color: #3c096c;
+  /* dark violet */
+  max-width: 100%;
+  /* margin: 40px auto;
+  padding: 20px; */
 }
 
-#form{
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: inline-block;
+  background-color: #7b2ff7;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+  background-color: #5f22d1;
+}
+
+
+#form {
   color: #fff;
   width: 400px;
   max-width: 90%;
-  background-color: rgba(255,255,255,0);
-  
+  background-color: rgba(255, 255, 255, 0);
 }
 
 /* Header */
@@ -28,133 +49,40 @@ h1 {
   text-align: center;
   margin-bottom: 30px;
   font-weight: 700;
-  color: #240046; /* very dark violet */
+  color: #240046;
+  /* very dark violet */
   letter-spacing: 1px;
 }
 
-/* Link buttons */
-a {
-  display: inline-block;
-  background-color: #7b2ff7; /* medium violet */
-  color: white;
-  text-align: right;
-  padding: 10px 18px;
+/* Timer style */
+.timer {
+  font-weight: bold;
+  color: red;
+  margin-bottom: 10px;
+}
+
+.errors {
+  color: red;
+}
+
+.success {
+  background-color: #d1e7dd;
+  color: #0f5132;
   border-radius: 6px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: background-color 0.3s ease;
+  padding: 12px 15px;
   margin-bottom: 20px;
 }
 
-a:hover {
-  background-color: #5f22d1; /* darker violet */
-}
-
-p {
-  text-align: center;
-  font-size: 1rem;
-  color: #3c096c; /* dark violet */
-  margin-bottom: 20px;
-}
-
-.top-right {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  font-size: 0.9rem;
-  color: #240046; /* dark violet, adjust as needed */
-}
-
-.top-right p {
-  margin: 0;
-}
-
-.top-right a {
-  color: #fbfbfc;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.top-right a:hover {
-  text-decoration: underline;
-}
-
-
-/* Table styles */
-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 10px;
-  background: white;
-  box-shadow: 0 2px 6px rgb(123 47 247 / 0.15);
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-thead tr {
-  background-color: #e0dbf9; /* very light violet */
-  text-align: left;
-}
-
-thead th {
-  padding: 15px 20px;
-  font-weight: 700;
-  color: #5f22d1; /* darker violet */
-  letter-spacing: 0.03em;
-  font-size: 0.9rem;
-}
-
-tbody tr {
-  background-color: #fff;
-  box-shadow: 0 1px 4px rgb(123 47 247 / 0.1);
-  transition: transform 0.2s ease;
-  cursor: default;
-  border-radius: 10px;
-}
-
-tbody tr:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgb(123 47 247 / 0.15);
-}
-
-tbody td {
-  padding: 15px 20px;
-  vertical-align: middle;
-  font-size: 0.95rem;
-  color: #3c096c;
-}
-
-/* Action links inside table */
-tbody td a {
-  color: #9d4edd; /* lighter violet */
-  font-weight: 600;
-  margin-right: 12px;
-  transition: color 0.3s ease;
-  color: #f5f3ff;
-}
-
-tbody td a:hover {
-  color: #eeedef; /* medium violet */
-}
-
-ul {
+.errors ul {
   list-style: none;
   padding-left: 0;
 }
 
-ul li {
-  padding: 6px 0;
-  font-size: 0.9rem;
-  color: #5f22d1;
+.errors li {
+  padding: 4px 0;
 }
 
-ul li input[type="checkbox"] {
-  margin-right: 10px;
-  transform: scale(1.1);
-  cursor: pointer;
-}
-
-/* Form styles */
+/* OTP Form styles */
 form {
   background: white;
   padding: 30px 25px;
@@ -200,10 +128,7 @@ form textarea:focus {
   box-shadow: 0 0 8px #b794f4;
 }
 
-form textarea {
-  min-height: 100px;
-}
-
+/* OTP Buttons */
 form button {
   background-color: #7b2ff7;
   color: white;
@@ -214,7 +139,7 @@ form button {
   font-weight: 700;
   cursor: pointer;
   margin-top: 15px;
-  width: 100%;
+  width: 48%;
   transition: background-color 0.3s ease;
 }
 
@@ -222,21 +147,19 @@ form button:hover {
   background-color: #5f22d1;
 }
 
-/* Errors and success messages */
-.errors {
-  background-color: #f8d7da;
-  color: #842029;
-  border-radius: 6px;
-  padding: 12px 15px;
-  margin-bottom: 20px;
+form button[name="resend"] {
+  background-color: #fb8500;
 }
 
-.success {
-  background-color: #d1e7dd;
-  color: #0f5132;
-  border-radius: 6px;
-  padding: 12px 15px;
-  margin-bottom: 20px;
+form button[name="resend"]:hover {
+  background-color: #e07b00;
+}
+
+/* Button container */
+form .button-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 4%;
 }
 
 /* Responsive */
@@ -246,40 +169,16 @@ form button:hover {
     padding: 10px;
   }
 
-  table, form {
+  form {
     width: 100%;
   }
 
-  thead tr {
-    display: none; /* hide table header on small screens */
+  form .button-group {
+    flex-direction: column;
+    gap: 10px;
   }
 
-  tbody tr {
-    display: block;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 8px rgba(123,47,247,0.1);
-    border-radius: 12px;
-  }
-
-  tbody td {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 15px;
-    font-size: 1rem;
-    border-bottom: 1px solid #d3c0fc;
-  }
-
-  tbody td:last-child {
-    border-bottom: none;
-  }
-
-  tbody td::before {
-    content: attr(data-label);
-    font-weight: 600;
-    color: #7b2ff7;
-  }
-
-  tbody td a {
-    margin-right: 6px;
+  form button {
+    width: 100%;
   }
 }

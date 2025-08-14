@@ -2,37 +2,42 @@
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit;
+  header("Location: login.php");
+  exit;
 }
 
 require 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title = $conn->real_escape_string($_POST['title']);
-    $description = $conn->real_escape_string($_POST['description']);
-    $due_date = $_POST['due_date'];
-    $priority = $_POST['priority'];
+  $title = $conn->real_escape_string($_POST['title']);
+  $description = $conn->real_escape_string($_POST['description']);
+  $due_date = $_POST['due_date'];
+  $priority = $_POST['priority'];
 
-    $user_id = $_SESSION['user_id'];
-    $sql = "INSERT INTO tasks (title, description, due_date, status, priority, user_id) VALUES ('$title', '$description', '$due_date', 'To-do', '$priority', $user_id)";
+  $user_id = $_SESSION['user_id'];
+  $sql = "INSERT INTO tasks (title, description, due_date, status, priority, user_id) VALUES ('$title', '$description', '$due_date', 'To-do', '$priority', $user_id)";
 
-    if ($conn->query($sql) === TRUE) {
-        header("Location: index.php");
-        exit;
-    } else {
-        echo "Error: " . $conn->error;
-    }
+  if ($conn->query($sql) === TRUE) {
+    header("Location: index.php");
+    exit;
+  } else {
+    echo "Error: " . $conn->error;
+  }
 }
 ?>
 
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Add Task</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+  <a href="javascript:history.back()" class="back-button">
+    &#8592; Back
+  </a>
   <h1>Add New Task</h1>
   <form method="POST" action="">
     <label>Title:</label><br>
@@ -61,4 +66,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <br>
   <a href="index.php">Back to Task List</a>
 </body>
+
 </html>

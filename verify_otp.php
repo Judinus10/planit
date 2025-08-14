@@ -63,51 +63,60 @@ $time_left = max($time_left, 0);
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Verify OTP</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        .timer { font-weight: bold; color: red; margin-bottom: 10px; }
-        .errors { color: red; }
+
     </style>
 </head>
+
 <body>
-<h1>Verify OTP</h1>
+    <a href="javascript:history.back()" class="back-button">
+        &#8592; Back
+    </a>
 
-<?php if ($errors): ?>
-<div class="errors">
-    <ul>
-        <?php foreach ($errors as $e) echo "<li>$e</li>"; ?>
-    </ul>
-</div>
-<?php endif; ?>
+    <h1>Verify OTP</h1>
 
-<p class="timer" id="timer">Time left: <?php echo sprintf("%02d:%02d", floor($time_left / 60), $time_left % 60); ?></p>
+    <?php if ($errors): ?>
+        <div class="errors">
+            <ul>
+                <?php foreach ($errors as $e)
+                    echo "<li>$e</li>"; ?>
+            </ul>
+        </div>
+    <?php endif; ?>
 
-<form method="POST" action="">
-    <label>Enter OTP sent to your email:</label>
-    <input type="text" name="otp" maxlength="6">
-    <button type="submit" name="verify">Verify</button>
-    <button type="submit" name="resend">Resend OTP</button>
-</form>
+    <p class="timer" id="timer">Time left: <?php echo sprintf("%02d:%02d", floor($time_left / 60), $time_left % 60); ?>
+    </p>
 
-<script>
-// Countdown timer in JavaScript
-let timeLeft = <?php echo $time_left; ?>;
+    <form method="POST" action="">
+        <label>Enter OTP sent to your email:</label>
+        <input type="text" name="otp" maxlength="6">
+        <button type="submit" name="verify">Verify</button>
+        <button type="submit" name="resend">Resend OTP</button>
+    </form>
 
-function updateTimer() {
-    if (timeLeft <= 0) {
-        document.getElementById('timer').innerHTML = "OTP expired. Please resend OTP.";
-        document.querySelector('button[name="verify"]').disabled = true;
-        return;
-    }
+    <script>
+        // Countdown timer in JavaScript
+        let timeLeft = <?php echo $time_left; ?>;
 
-    let minutes = Math.floor(timeLeft / 60);
-    let seconds = timeLeft % 60;
-    document.getElementById('timer').innerHTML = `Time left: ${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
-    timeLeft--;
-}
+        function updateTimer() {
+            if (timeLeft <= 0) {
+                document.getElementById('timer').innerHTML = "OTP expired. Please resend OTP.";
+                document.querySelector('button[name="verify"]').disabled = true;
+                return;
+            }
 
-setInterval(updateTimer, 1000);
-</script>
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            document.getElementById('timer').innerHTML = `Time left: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            timeLeft--;
+        }
+
+        setInterval(updateTimer, 1000);
+    </script>
 </body>
+
 </html>
