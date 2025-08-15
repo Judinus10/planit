@@ -12,15 +12,15 @@ if (!isset($_SESSION['otp'], $_SESSION['reg_email'])) {
 }
 
 // Handle OTP verification
+$success = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify'])) {
     $user_otp = trim($_POST['otp']);
 
-    // Check OTP expiration (5 minutes)
     if (time() - $_SESSION['otp_time'] > 300) {
         $errors[] = "OTP expired. Please register again.";
         session_destroy();
     } elseif ($user_otp == $_SESSION['otp']) {
-        // OTP correct, insert user
         $username = $_SESSION['reg_username'];
         $email = $_SESSION['reg_email'];
         $password = $_SESSION['reg_password'];
@@ -33,8 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify'])) {
         if ($stmt->execute()) {
             session_unset();
             session_destroy();
-            echo "Registration successful! You can <a href='login.php'>login</a> now.";
-            exit;
+            $success = "Registration successful! You can <a href='login.php'>login</a> now.";
         } else {
             $errors[] = "Error creating user: " . $conn->error;
         }
@@ -42,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify'])) {
         $errors[] = "Invalid OTP, please try again.";
     }
 }
+
 
 // Handle resend OTP
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend'])) {
@@ -97,6 +97,12 @@ $time_left = max($time_left, 0);
         <button type="submit" name="verify">Verify</button>
         <button type="submit" name="resend">Resend OTP</button>
     </form>
+
+    <?php if ($success): ?>
+        <div class="success-message">
+            <?php echo $success; ?>
+        </div>
+    <?php endif; ?>
 
     <script>
         // Countdown timer in JavaScript
