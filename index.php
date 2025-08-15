@@ -59,7 +59,11 @@ $result = $conn->query($sql);
     </style>
 </head>
 <body>
-    <?php include 'header.php'; ?>
+    <div class="top-right">
+        Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?> 
+        <a href="edit_profile.php" title="Edit Profile">&#9998;</a> | <!-- pencil icon -->
+        <a href="logout.php">Logout</a>
+    </div>
 
     <h1>Tasks for: <?php echo $project_name; ?></h1>
 

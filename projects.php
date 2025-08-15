@@ -80,8 +80,11 @@ $projects_result = $conn->query("
 </head>
 
 <body>
-    <?php include 'header.php'; ?>
-
+    <div class="top-right">
+        Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?> 
+        <a href="edit_profile.php" title="Edit Profile">&#9998;</a> | <!-- pencil icon -->
+        <a href="logout.php">Logout</a>
+    </div>
 
     <a href="notification.php" style="margin-right:10px;">Notifications</a>
 
