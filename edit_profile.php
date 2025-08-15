@@ -81,8 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<?php include 'header.php'; ?>
-
+<a href="javascript:history.back()" class="back-button">&#8592; Back</a>
 <h1>Edit Profile</h1>
 
 <?php if ($success) echo "<p style='color:green;'>$success</p>"; ?>
@@ -98,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <label>New Password:</label><br>
     <input type="password" name="new_password" placeholder="Leave blank to keep current password" autocomplete="new-password"><br><br>
 
-    <label>Current Password (required if changing email or password):</label><br>
+    <label>Current Password (required):</label><br>
     <input type="password" name="current_password" placeholder="Enter current password" autocomplete="new-password"><br><br>
 
     <button type="submit">Save Changes</button>
