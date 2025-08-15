@@ -42,6 +42,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             VALUES ('$title', '$description', '$due_date', 'To-do', '$priority', $user_id, $project_id, " . ($assigned_to ?: "NULL") . ")";
 
     if ($conn->query($sql) === TRUE) {
+        $task_id = $conn->insert_id;
+
+        // Send notification if assigned_to is set and not the creator
+        if ($assigned_to && $assigned_to != $user_id) {
+            $stmt = $conn->prepare("
+                INSERT INTO notifications (user_id, message, project_id, type, created_at)
+                VALUES (?, ?, ?, 'task_assigned', NOW())
+            ");
+            $msg = "You have been assigned a new task: '$title'.";
+            $stmt->bind_param("isi", $assigned_to, $msg, $project_id);
+            $stmt->execute();
+        }
+
         header("Location: index.php?project_id=$project_id");
         exit;
     } else {
@@ -49,6 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html>

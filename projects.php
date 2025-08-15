@@ -81,7 +81,7 @@ $projects_result = $conn->query("
 
 <body>
     <div class="top-right">
-        Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?> 
+        Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>
         <a href="edit_profile.php" title="Edit Profile">&#9998;</a> | <!-- pencil icon -->
         <a href="logout.php">Logout</a>
     </div>
@@ -130,12 +130,26 @@ $projects_result = $conn->query("
                             <td>
                                 <?php echo ($project['created_by'] == $user_id) ? 'Owner' : 'Member'; ?>
                             </td>
-                            <td><a href="projects.php?delete=<?php echo $project['id']; ?>"
-                                    onclick="event.stopPropagation(); return confirm('Delete this project?')">Delete</a></td>
-                            <td><a href="collab.php?project_id=<?php echo $project['id']; ?>"
-                                    onclick="event.stopPropagation();">Manage Members</a></td>
+                            <td>
+                                <?php if ($project['created_by'] == $user_id): ?>
+                                    <a href="projects.php?delete=<?php echo $project['id']; ?>"
+                                        onclick="event.stopPropagation(); return confirm('Delete this project?')">Delete</a>
+                                <?php else: ?>
+                                    <!-- Not owner, no delete link -->
+                                    &mdash;
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?php if ($project['created_by'] == $user_id): ?>
+                                    <a href="collab.php?project_id=<?php echo $project['id']; ?>"
+                                        onclick="event.stopPropagation();">Manage Members</a>
+                                <?php else: ?>
+                                    &mdash;
+                                <?php endif; ?>
+                            </td>
                         </tr>
                     <?php endwhile; ?>
+
                 </tbody>
             </table>
         <?php endif; ?>
