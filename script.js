@@ -1,98 +1,33 @@
-// document.querySelectorAll('.subtask-toggle').forEach(checkbox => {
-//     checkbox.addEventListener('change', () => {
-//     const subtaskId = checkbox.getAttribute('data-subtask-id');
-//     const status = checkbox.checked ? 'completed' : 'pending';
+document.querySelectorAll('.toggleSubtaskBtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const taskRow = btn.closest('tr');
+        const statusSelect = taskRow.querySelector('td select'); // Select the status dropdown
+        const status = statusSelect ? statusSelect.value.toLowerCase() : '';
+        let nextRow = taskRow.nextElementSibling;
 
-//     fetch('toggle_subtask.php', {
-//         method: 'POST',
-//         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-//         body: `id=${subtaskId}&status=${status}`
-//     }).then(res => res.text())
-//         .then(data => {
-//         // Optionally show success or error messages here
-//         // console.log(data);
-//         }).catch(err => {
-//         alert('Failed to update subtask status.');
-//         });
-//     });
-// });
+        // Disable adding subtask if task is completed
+        if (status === 'completed') {
+            alert("Cannot add subtask to a completed task.");
+            return;
+        }
 
-// function updateStatus(taskId, newStatus) {
-//     fetch('update.php', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-//         body: 'id=' + taskId + '&status=' + newStatus
-//     })
-//     .then(res => res.text())
-//     .then(data => {
-//         console.log(data); // Debugging
-//         // alert('Status updated successfully');
-//     })
-//     .catch(err => console.error(err));
-// }
+        while(nextRow && (nextRow.classList.contains('subtask-row') || nextRow.classList.contains('subtask-form-row'))) {
+            if(nextRow.style.display === 'none' || nextRow.style.display === '') {
+                nextRow.style.display = (nextRow.classList.contains('subtask-row') || nextRow.classList.contains('subtask-form-row')) ? 'table-row' : '';
+            } else {
+                nextRow.style.display = 'none';
+            }
+            nextRow = nextRow.nextElementSibling;
+        }
 
-// function updatePriority(taskId, newPriority) {
-//     fetch('update.php', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-//         body: 'id=' + taskId + '&priority=' + newPriority
-//     })
-//     .then(res => res.text())
-//     .then(data => {
-//         console.log(data); // Debugging
-//         // alert('Priority updated successfully');
-//     })
-//     .catch(err => console.error(err));
-// }
+        // Toggle button text based on first row's visibility
+        const firstRow = taskRow.nextElementSibling;
+        btn.textContent = (firstRow.style.display === 'table-row') ? 'Add Subtask' : 'Hide Subtask Form';
+    });
+});
 
-// function updateStatus(taskId, newStatus, rowElement) {
-//     fetch('update.php', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-//         body: `id=${taskId}&status=${encodeURIComponent(newStatus)}`
-//     })
-//     .then(response => response.text())
-//     .then(() => {
-//         const tbody = rowElement.parentElement;
 
-//         if (newStatus === 'completed') {
-//             rowElement.classList.add('completed-task');
-//             // move above the first subtask row or at the end
-//             let lastRow = Array.from(tbody.querySelectorAll('tr.task-row')).pop();
-//             tbody.appendChild(rowElement);
-//         } else {
-//             rowElement.classList.remove('completed-task');
-
-//             // get all task rows except this one and completed
-//             let taskRows = Array.from(tbody.querySelectorAll('tr.task-row'))
-//                 .filter(r => r !== rowElement && !r.classList.contains('completed-task'));
-
-//             let rowDate = new Date(rowElement.cells[2].innerText);
-//             let inserted = false;
-
-//             for (let r of taskRows) {
-//                 let rDate = new Date(r.cells[2].innerText);
-//                 if (rowDate < rDate) {
-//                     tbody.insertBefore(rowElement, r);
-//                     inserted = true;
-//                     break;
-//                 }
-//             }
-
-//             if (!inserted) {
-//                 // insert before first completed row
-//                 let firstCompleted = tbody.querySelector('tr.completed-task');
-//                 if (firstCompleted) {
-//                     tbody.insertBefore(rowElement, firstCompleted);
-//                 } else {
-//                     tbody.appendChild(rowElement);
-//                 }
-//             }
-//         }
-//     });
-// }
-
-// Subtask toggle
+// Subtask checkbox toggle for status
 document.querySelectorAll('.subtask-toggle').forEach(checkbox => {
     checkbox.addEventListener('change', () => {
         const subtaskId = checkbox.dataset.subtaskId;
@@ -105,6 +40,7 @@ document.querySelectorAll('.subtask-toggle').forEach(checkbox => {
         }).catch(() => alert('Failed to update subtask'));
     });
 });
+
 
 // Task status update + reorder
 function updateStatus(taskId, newStatus, rowElement) {
@@ -157,50 +93,16 @@ function updatePriority(taskId,newPriority){
     }).catch(err=>console.error(err));
 }
 
-// Subtask form toggle
-document.querySelectorAll('.toggleSubtaskBtn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const nextRow = btn.closest('tr').nextElementSibling;
-        if(nextRow && nextRow.classList.contains('subtask-row')){
-            if(nextRow.style.display==='none'){
-                nextRow.style.display='table-row';
-                btn.textContent='Hide Subtask Form';
-            } else {
-                nextRow.style.display='none';
-                btn.textContent='Add Subtask';
-            }
-        }
-    });
-});
 
+// const toggleBtn = document.getElementById('toggleSubtaskBtn');
+//   const formRow = document.getElementById('subtaskFormRow');
 
-const toggleBtn = document.getElementById('toggleSubtaskBtn');
-  const formRow = document.getElementById('subtaskFormRow');
-
-  toggleBtn.addEventListener('click', () => {
-    if (formRow.style.display === 'none') {
-      formRow.style.display = 'table-row';
-      toggleBtn.textContent = 'Hide Subtask Form';
-    } else {
-      formRow.style.display = 'none';
-      toggleBtn.textContent = 'Add Subtask';
-    }
-  });
-
-// Countdown timer in JavaScript
-// let timeLeft = <?php echo $time_left; ?>;
-
-function updateTimer() {
-    if (timeLeft <= 0) {
-        document.getElementById('timer').innerHTML = "OTP expired. Please register again.";
-        document.querySelector('button[type="submit"]').disabled = true;
-        return;
-    }
-
-    let minutes = Math.floor(timeLeft / 60);
-    let seconds = timeLeft % 60;
-    document.getElementById('timer').innerHTML = `Time left: ${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
-    timeLeft--;
-}
-
-setInterval(updateTimer, 1000);
+//   toggleBtn.addEventListener('click', () => {
+//     if (formRow.style.display === 'none') {
+//       formRow.style.display = 'table-row';
+//       toggleBtn.textContent = 'Hide Subtask Form';
+//     } else {
+//       formRow.style.display = 'none';
+//       toggleBtn.textContent = 'Add Subtask';
+//     }
+//   });
