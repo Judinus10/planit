@@ -95,7 +95,7 @@ $projects_result = $conn->query("
 
     <!-- Create Project Form -->
     <div class="section1">
-        <h2>Create New Project</h2>
+        <!-- <h2>Create New Project</h2> -->
         <form method="POST">
             <label>Project Name:</label>
             <input type="text" name="name" required>
