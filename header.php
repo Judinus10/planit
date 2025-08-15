@@ -1,4 +1,4 @@
-<!-- header.php -->
+<!-- not in use need to be advance -->
 <?php
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
