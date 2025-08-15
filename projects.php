@@ -80,9 +80,8 @@ $projects_result = $conn->query("
 </head>
 
 <body>
-    <div class="top-right">
-        <p>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?> | <a href="logout.php">Logout</a></p>
-    </div>
+    <?php include 'header.php'; ?>
+
 
     <a href="notification.php" style="margin-right:10px;">Notifications</a>
 

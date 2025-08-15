@@ -59,10 +59,7 @@ $result = $conn->query($sql);
     </style>
 </head>
 <body>
-    <a href="javascript:history.back()" class="back-button">&#8592; Back</a>
-    <div class="top-right">
-        <p>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?> | <a href="logout.php">Logout</a></p>
-    </div>
+    <?php include 'header.php'; ?>
 
     <h1>Tasks for: <?php echo $project_name; ?></h1>
 
