@@ -12,8 +12,8 @@ $sql = "SELECT t.id, t.title, t.due_date, t.status,
                owner.email AS owner_email,
                assignee.email AS assignee_email
         FROM tasks t
-        JOIN users owner ON t.user_id = owner.id           -- project owner
-        JOIN users assignee ON t.assigned_to = assignee.id -- task assignee
+        JOIN users owner ON t.user_id = owner.id           
+        JOIN users assignee ON t.assigned_to = assignee.id 
         WHERE t.notified = 0
         AND t.status != 'completed'
         AND t.due_date <= DATE_ADD(?, INTERVAL 1 HOUR)
@@ -34,7 +34,7 @@ while ($task = $result->fetch_assoc()) {
     }
 
     // Send email to assignee
-    if (sendEmail($task['assignee_email'], $message, $subject)) {
+    if (sendEmail($task['assignee_email'], $message, $subject) && $task['assignee_email'] != $task['owner_email']) {
         echo "✅ Email sent to assignee ({$task['assignee_email']}) for task ID {$task['id']}<br>";
     }
 
