@@ -52,16 +52,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $due_date = $_POST['due_date'];
     $assigned_to = isset($_POST['assigned_to']) ? (int)$_POST['assigned_to'] : NULL;
 
+    // Check if assigned_to changed
+    $previous_assigned = $task['assigned_to'];
+
     $sql = "UPDATE tasks 
             SET title='$title', description='$description', due_date='$due_date', assigned_to=" . ($assigned_to ?: "NULL") . " 
             WHERE id=$id";
+
     if ($conn->query($sql) === TRUE) {
+
+        // Send notification if assigned_to is set, not null, and different from previous
+        if ($assigned_to && $assigned_to != $task['user_id'] && $assigned_to != $previous_assigned) {
+            $stmt = $conn->prepare("
+                INSERT INTO notifications (user_id, message, project_id, type, created_at)
+                VALUES (?, ?, ?, 'task_assigned', NOW())
+            ");
+            $msg = "You have been assigned a task: '$title'.";
+            $stmt->bind_param("isi", $assigned_to, $msg, $project_id);
+            $stmt->execute();
+        }
+
         header("Location: index.php?project_id=$project_id");
         exit;
     } else {
         echo "Error updating record: " . $conn->error;
     }
 }
+
 ?>
 
 <!DOCTYPE html>
