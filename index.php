@@ -135,7 +135,7 @@ $result = $conn->query($sql);
                                 <strong>Subtasks:</strong>
                                 <ul>
                                     <?php while ($subtask = $subtask_result->fetch_assoc()):
-                                        $checked = ($subtask['status'] !== 'completed') ? "checked" : ""; ?>
+                                        $checked = ($subtask['status'] == 'completed') ? "checked" : ""; ?>
                                         <li>
                                             <input type="checkbox" class="subtask-toggle"
                                                 data-subtask-id="<?php echo $subtask['id']; ?>" <?php echo $checked; ?>>
