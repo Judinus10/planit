@@ -359,6 +359,38 @@ form button:hover {
   text-align: center;
 }
 
+/* Style for all select dropdowns */
+tbody select {
+    appearance: none;       /* Remove default arrow (works in most browsers) */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    
+    border: none;           /* Remove default border */
+    background: #f0f0f0;    /* Light gray background */
+    padding: 8px 12px;
+    border-radius: 8px;     /* Rounded corners */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Soft shadow */
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* On hover/focus effect */
+tbody select:hover, select:focus {
+    background: #e0e0e0;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    outline: none;
+}
+
+/* Optional: add a custom arrow */
+tbody select {
+    background-image: url("data:image/svg+xml;utf8,<svg fill='%23666' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+    padding-right: 30px; /* space for the arrow */
+}
+
 
 /* Responsive */
 @media (max-width: 600px) {
