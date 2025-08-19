@@ -1,6 +1,7 @@
 <?php
 session_start();
 require 'db.php';
+require 'send_email.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -30,19 +31,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Invite via email
-    if (isset($_POST['invite_email'])) {
+    if (!empty($_POST['invite_email'])) {
         $invite_email = trim($_POST['invite_email']);
-        if (!empty($invite_email)) {
-            $stmt = $conn->prepare("INSERT INTO invitations (project_id, email, invited_by) VALUES (?, ?, ?)");
-            $stmt->bind_param("isi", $project_id, $invite_email, $user_id);
-            $stmt->execute();
 
-            $subject = "Project Collaboration Invitation";
-            $link = "http://yourwebsite.com/register.php?project_id=$project_id";
-            $body = "You have been invited to collaborate on a project. Click here to join: $link";
-            mail($invite_email, $subject, $body);
+        $stmt = $conn->prepare("INSERT INTO invitations (project_id, email, invited_by) VALUES (?, ?, ?)");
+        $stmt->bind_param("isi", $project_id, $invite_email, $user_id);
+        $stmt->execute();
 
+        $subject = "Project Collaboration Invitation";
+        $link = "http://yourwebsite.com/register.php?project_id=$project_id";
+        $body = "You have been invited to collaborate on a project. Click here to join: $link";
+
+        if (sendEmail($invite_email, $body, $subject)) {
             $message = "Invitation sent to $invite_email";
+        } else {
+            $message = "Failed to send invitation email.";
         }
     }
 
