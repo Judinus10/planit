@@ -43,6 +43,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $_SESSION['reg_password'] = $password_hash;
       $_SESSION['otp'] = $otp;
       $_SESSION['otp_time'] = time();
+      $_SESSION['new_email'] = $email;       
+      $_SESSION['username'] = $username;        
+      $_SESSION['hashed_password'] = $password_hash;  
+      $_SESSION['otp_mode'] = 'registration';
+
 
       // Send OTP using PHPMailer from send_otp.php
       $sent = sendOtpEmail($email, $otp); // A function you create in send_otp.php
