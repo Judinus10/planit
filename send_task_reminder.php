@@ -10,7 +10,8 @@ $oneHourAgo = date('Y-m-d H:i:s', strtotime('-1 hour'));
 // Fetch tasks due soon, not completed, not yet notified
 $sql = "SELECT t.id, t.title, t.due_date, t.status,
                owner.email AS owner_email,
-               assignee.email AS assignee_email
+               assignee.email AS assignee_email,
+               assignee.username AS assignee_name
         FROM tasks t
         JOIN users owner ON t.user_id = owner.id           
         JOIN users assignee ON t.assigned_to = assignee.id 
@@ -26,7 +27,7 @@ $result = $stmt->get_result();
 
 while ($task = $result->fetch_assoc()) {
     $subject = "Reminder: Task '{$task['title']}' is due soon!";
-    $message = "Hello,\n\nYour task '{$task['title']}' is due at {$task['due_date']}.\nAssigned to: {$task['assignee_username']}.\nPlease ensure it is completed on time.\n\n- Task Manager";
+    $message = "Hello,\n\nYour task '{$task['title']}' is due at {$task['due_date']}.\nAssigned to: {$task['assignee_name']}.\nPlease ensure it is completed on time.\n\n- Task Manager";
 
     // Send email to project owner
     if (sendEmail($task['owner_email'], $message, $subject)) {
