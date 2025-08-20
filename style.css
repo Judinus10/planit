@@ -391,8 +391,99 @@ tbody select {
     padding-right: 30px; /* space for the arrow */
 }
 
+tbody select option {
+    padding: 8px;
+    font-size: 14px;
+    background-color: #fff;
+    color: #333;
+}
+
+/* Completed task row (already in your code logic, but let's make it nicer) */
+.completed-task td {
+    text-decoration: line-through;
+    color: #888;
+    background-color: #f9f9f9;
+}
+
+.toggleSubtaskBtn {
+    background-color: #6c63ff; /* Nice purple */
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.toggleSubtaskBtn:hover {
+    background-color: #574bff; /* Darker purple */
+    transform: scale(1.05);
+}
+
+.toggleSubtaskBtn:active {
+    background-color: #3b32cc; /* Even darker when clicked */
+    transform: scale(0.95);
+}
+
+
 
 /* Responsive */
+/* @media (max-width: 600px) {
+  body {
+    margin: 20px 10px;
+    padding: 10px;
+  }
+
+  table, form {
+    width: 100%;
+  }
+
+  thead tr {
+    display: none; 
+  }
+
+  tbody tr {
+    display: block;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(123,47,247,0.1);
+    border-radius: 12px;
+  }
+
+  tbody td {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 15px;
+    font-size: 1rem;
+    border-bottom: 1px solid #d3c0fc;
+  }
+
+  tbody td:last-child {
+    border-bottom: none;
+  }
+
+  tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #7b2ff7;
+  }
+
+  tbody td a {
+    margin-right: 6px;
+  }
+
+  .section {
+    padding: 20px 15px;
+  }
+
+  .actions button {
+    display: block;
+    width: 80%;
+    margin: 10px auto;
+  }
+} */
+
+/* -------- Small devices (phones) -------- */
 @media (max-width: 600px) {
   body {
     margin: 20px 10px;
@@ -444,5 +535,75 @@ tbody select {
     display: block;
     width: 80%;
     margin: 10px auto;
+  }
+
+  .toggleSubtaskBtn {
+    width: 100%;
+    margin-top: 8px;
+  }
+}
+
+/* -------- Medium devices (tablets, 600px - 900px) -------- */
+@media (min-width: 601px) and (max-width: 900px) {
+  body {
+    padding: 15px;
+  }
+
+  table {
+    font-size: 0.9rem;
+  }
+
+  thead th, tbody td {
+    padding: 10px 12px;
+  }
+
+  form, .section {
+    width: 95%;
+  }
+
+  .actions button {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+}
+
+/* -------- Large devices (small laptops, 901px - 1200px) -------- */
+@media (min-width: 901px) and (max-width: 1200px) {
+  body {
+    padding: 20px 30px;
+  }
+
+  table {
+    font-size: 1rem;
+  }
+
+  form, .section {
+    width: 80%;
+  }
+
+  .actions button {
+    padding: 12px 18px;
+    font-size: 1rem;
+  }
+}
+
+/* -------- Extra large devices (desktops, >1200px) -------- */
+@media (min-width: 1201px) {
+  body {
+    padding: 40px 60px;
+  }
+
+  table {
+    width: 100%;
+    font-size: 1rem;
+  }
+
+  form, .section {
+    width: 70%;
+  }
+
+  .actions button {
+    padding: 14px 22px;
+    font-size: 1.05rem;
   }
 }
