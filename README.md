@@ -30,7 +30,7 @@ project-root/
 │── projects.php        # Manage projects  
 │── tasks.php           # Manage tasks  
 │── logout.php          # Logout user  
-│── assets/             # CSS, JS, Images  
+│──  ..........
 │── README.md           # Project documentation  
 ```
 
@@ -39,7 +39,7 @@ project-root/
 1. Clone the repository or download the source code:
 
    ```bash
-   git clone https://github.com/yourusername/task-manager.git
+   git clone https://github.com/Judinus10/task-manager.git
    cd task-manager
    ```
 2. Import the SQL file into your MySQL/MariaDB:
