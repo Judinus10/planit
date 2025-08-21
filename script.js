@@ -29,20 +29,67 @@ document.querySelectorAll('.toggleSubtaskBtn').forEach(btn => {
 
 // Subtask checkbox toggle for status
 document.querySelectorAll('.subtask-toggle').forEach(checkbox => {
-    checkbox.addEventListener('change', () => {
-        const subtaskId = checkbox.dataset.subtaskId;
-        const status = checkbox.checked ? 'completed' : 'pending';
+    checkbox.addEventListener('change', function() {
+        const subtaskId = this.dataset.subtaskId;
+        const status = this.checked ? 'completed' : 'To-do';
 
-        fetch('toggle_subtask.php', {
+        fetch('update_subtask.php', {
             method: 'POST',
-            headers: {'Content-Type':'application/x-www-form-urlencoded'},
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `id=${subtaskId}&status=${status}`
-        }).catch(() => alert('Failed to update subtask'));
+        })
+        .then(res => res.text())
+        .then(data => {
+            if (data !== 'success') {
+                alert("Error updating subtask: " + data);
+            }
+        });
     });
 });
 
-
 // Task status update + reorder
+// function updateStatus(taskId, newStatus, rowElement) {
+//     fetch('update.php', {
+//         method:'POST',
+//         headers:{'Content-Type':'application/x-www-form-urlencoded'},
+//         body:`id=${taskId}&status=${encodeURIComponent(newStatus)}`
+//     }).then(()=>{
+//         const tbody = rowElement.parentElement;
+
+//         if(newStatus==='completed') {
+//             rowElement.classList.add('completed-task');
+//             tbody.appendChild(rowElement);
+//         } else {
+//             rowElement.classList.remove('completed-task');
+
+//             let taskRows = Array.from(tbody.querySelectorAll('tr.task-row'))
+//                 .filter(r=>r!==rowElement && !r.classList.contains('completed-task'));
+
+//             let rowDate = new Date(rowElement.cells[2].innerText);
+//             let inserted=false;
+
+//             for(let r of taskRows){
+//                 let rDate = new Date(r.cells[2].innerText);
+//                 if(rowDate < rDate){
+//                     tbody.insertBefore(rowElement,r);
+//                     inserted=true;
+//                     break;
+//                 }
+//             }
+
+//             if(!inserted){
+//                 let firstCompleted = tbody.querySelector('tr.completed-task');
+//                 if(firstCompleted){
+//                     tbody.insertBefore(rowElement, firstCompleted);
+//                 } else {
+//                     tbody.appendChild(rowElement);
+//                 }
+//             }
+//         }
+//     });
+// }
+
+// ...existing code...
 function updateStatus(taskId, newStatus, rowElement) {
     fetch('update.php', {
         method:'POST',
@@ -54,6 +101,13 @@ function updateStatus(taskId, newStatus, rowElement) {
         if(newStatus==='completed') {
             rowElement.classList.add('completed-task');
             tbody.appendChild(rowElement);
+
+            // Hide subtask rows and subtask form row
+            let nextRow = rowElement.nextElementSibling;
+            while(nextRow && (nextRow.classList.contains('subtask-row') || nextRow.classList.contains('subtask-form-row'))) {
+                nextRow.style.display = 'none';
+                nextRow = nextRow.nextElementSibling;
+            }
         } else {
             rowElement.classList.remove('completed-task');
 
@@ -80,9 +134,36 @@ function updateStatus(taskId, newStatus, rowElement) {
                     tbody.appendChild(rowElement);
                 }
             }
+
+            // Show subtask rows and subtask form row
+            let nextRow = rowElement.nextElementSibling;
+            while(nextRow && (nextRow.classList.contains('subtask-row') || nextRow.classList.contains('subtask-form-row'))) {
+                nextRow.style.display = 'table-row';
+                nextRow = nextRow.nextElementSibling;
+            }
         }
     });
 }
+
+document.querySelectorAll('.delete-subtask-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const subtaskId = btn.dataset.subtaskId;
+        if(confirm('Delete this subtask?')) {
+            fetch('delete_subtask.php', {
+                method: 'POST',
+                headers: {'Content-Type':'application/x-www-form-urlencoded'},
+                body: `id=${subtaskId}`
+            })
+            .then(res => res.text())
+            .then(() => {
+                // Remove subtask row from DOM
+                btn.closest('li').remove();
+            })
+            .catch(() => alert('Failed to delete subtask'));
+        }
+    });
+});
 
 // Task priority update
 function updatePriority(taskId,newPriority){
