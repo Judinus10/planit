@@ -422,7 +422,7 @@ tbody select option {
 
 /* Responsive */
 /* -------- Small devices (phones) -------- */
-@media (max-width: 480px) {
+/* @media (max-width: 480px) {
   body {
     margin: 20px 10px;
     padding: 10px;
@@ -476,6 +476,33 @@ tbody select option {
     margin: 10px auto;
   }
 
+  .toggleSubtaskBtn {
+    width: 100%;
+    margin-top: 8px;
+  }
+} */
+
+@media (max-width: 480px) {
+  body {
+    margin: 20px 10px;
+    padding: 10px;
+  }
+
+  /* Make table scrollable horizontally */
+  table {
+    display: block;               /* treat table as a block */
+    width: 100%;                  /* occupy full width of container */
+    overflow-x: auto;             /* allow horizontal scrolling */
+    -webkit-overflow-scrolling: touch; /* smooth scrolling on mobile */
+    white-space: nowrap;          /* prevent cell content from wrapping */
+  }
+
+  /* Optional: keep spacing for table cells */
+  th, td {
+    padding: 8px 12px;
+  }
+
+  /* Keep buttons usable */
   .toggleSubtaskBtn {
     width: 100%;
     margin-top: 8px;
