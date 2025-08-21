@@ -126,42 +126,43 @@ $result = $conn->query($sql);
 
                     <?php
                     $task_id = $task['id'];
-                    $subtask_sql = "SELECT * FROM subtasks WHERE task_id=$task_id ORDER BY created_at ASC";
-                    $subtask_result = $conn->query($subtask_sql);
+                    if ($task['status'] != 'completed') {
+                        $subtask_sql = "SELECT * FROM subtasks WHERE task_id=$task_id ORDER BY created_at ASC";
+                        $subtask_result = $conn->query($subtask_sql);
 
-                    if ($subtask_result->num_rows > 0): ?>
-                        <tr class="subtask-row" style="display:table-row;">
-                            <td colspan="9" style="padding-left:40px; background:#f0eaff;">
-                                <strong>Subtasks:</strong>
-                                <ul>
-                                    <?php while ($subtask = $subtask_result->fetch_assoc()):
-                                        $checked = ($subtask['status'] == 'completed') ? "checked" : ""; ?>
-                                        <li>
-                                            <input type="checkbox" class="subtask-toggle"
-                                                data-subtask-id="<?php echo $subtask['id']; ?>" <?php echo $checked; ?>>
-                                            <?php echo htmlspecialchars($subtask['title']); ?>
-                                            <a href="delete_subtask.php?id=<?php echo $subtask['id']; ?>&task_id=<?php echo $task_id; ?>"
-                                                style="color:white; margin-left:8px;">Delete</a>
-                                        </li>
-                                    <?php endwhile; ?>
-                                </ul>
+                        if ($subtask_result->num_rows > 0): ?>
+                            <tr class="subtask-row" style="display:table-row;">
+                                <td colspan="9" style="padding-left:40px; background:#f0eaff;">
+                                    <strong>Subtasks:</strong>
+                                    <ul>
+                                        <?php while ($subtask = $subtask_result->fetch_assoc()):
+                                            $checked = ($subtask['status'] == 'completed') ? "checked" : ""; ?>
+                                            <li>
+                                                <input type="checkbox" class="subtask-toggle"
+                                                    data-subtask-id="<?php echo $subtask['id']; ?>" <?php echo $checked; ?>>
+                                                <?php echo htmlspecialchars($subtask['title']); ?>
+                                                <a href="delete_subtask.php?id=<?php echo $subtask['id']; ?>&task_id=<?php echo $task_id; ?>&project_id=<?php echo $project_id; ?>"
+                                                    style="color:white; margin-left:8px;">Delete</a>
+                                            </li>
+                                        <?php endwhile; ?>
+                                    </ul>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                        <tr class="subtask-form-row"
+                            style="<?php echo (isset($_GET['open_subtask']) && $_GET['open_subtask'] == $task_id) ? 'display:table-row;' : 'display:none;'; ?>">
+                            <td colspan="7" style="padding-left: 40px; background: #f0eaff;">
+                                <form method="POST" action="add_subtask.php" style="display: flex; gap: 8px; align-items: center;">
+                                    <input type="hidden" name="task_id" value="<?php echo $task_id; ?>">
+                                    <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+                                    <input type="text" name="title" placeholder="Add new subtask..." required
+                                        style="flex-grow: 1; padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc;">
+                                    <button type="submit"
+                                        style="background:#7b2ff7; color:white; border:none; padding:6px 14px; border-radius:4px; cursor:pointer;">Add</button>
+                                </form>
                             </td>
                         </tr>
-                    <?php endif; ?>
-                    <tr class="subtask-form-row"
-                        style="<?php echo (isset($_GET['open_subtask']) && $_GET['open_subtask'] == $task_id) ? 'display:table-row;' : 'display:none;'; ?>">
-                        <td colspan="7" style="padding-left: 40px; background: #f0eaff;">
-                            <form method="POST" action="add_subtask.php" style="display: flex; gap: 8px; align-items: center;">
-                                <input type="hidden" name="task_id" value="<?php echo $task_id; ?>">
-                                <input type="text" name="title" placeholder="Add new subtask..." required
-                                    style="flex-grow: 1; padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc;">
-                                <button type="submit"
-                                    style="background:#7b2ff7; color:white; border:none; padding:6px 14px; border-radius:4px; cursor:pointer;">Add</button>
-                            </form>
-                        </td>
-                    </tr>
-
-
+                    <?php } ?>
                 <?php endwhile; ?>
             <?php endif; ?>
         </tbody>
