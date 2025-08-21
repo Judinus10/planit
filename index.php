@@ -63,7 +63,11 @@ $result = $conn->query($sql);
 </head>
 
 <body>
-    <a href="javascript:history.back()" class="back-button">&#8592; Back</a>
+    <!-- <a href="javascript:history.back()" class="back-button">&#8592; Back</a> -->
+    <a href="projects.php?project_id=<?php echo $project_id; ?>">
+        ⬅ Back to Project
+    </a>
+
     <div class="top-right">
         Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>
         <a href="edit_profile.php" title="Edit Profile">&#9998;</a> | <!-- pencil icon -->

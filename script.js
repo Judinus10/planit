@@ -28,21 +28,45 @@ document.querySelectorAll('.toggleSubtaskBtn').forEach(btn => {
 
 
 // Subtask checkbox toggle for status
-document.querySelectorAll('.subtask-toggle').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-        const subtaskId = this.dataset.subtaskId;
-        const status = this.checked ? 'completed' : 'To-do';
+// document.querySelectorAll('.subtask-toggle').forEach(checkbox => {
+//     checkbox.addEventListener('change', function() {
+//         const subtaskId = this.dataset.subtaskId;
+//         const status = this.checked ? 'completed' : 'To-do';
 
-        fetch('update_subtask.php', {
+//         fetch('update_subtask.php', {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+//             body: `id=${subtaskId}&status=${status}`
+//         })
+//         .then(res => res.text())
+//         .then(data => {
+//             if (data !== 'success') {
+//                 alert("Error updating subtask: " + data);
+//             }
+//         });
+//     });
+// });
+
+document.querySelectorAll('.subtask-toggle').forEach(checkbox => {
+    checkbox.addEventListener('change', function () {
+        const subtaskId = this.dataset.subtaskId;
+        const status = this.checked ? 'completed' : 'pending';
+
+        fetch('toggle_subtask.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `id=${subtaskId}&status=${status}`
         })
         .then(res => res.text())
         .then(data => {
-            if (data !== 'success') {
-                alert("Error updating subtask: " + data);
+            if (data.trim() !== "OK") {
+                alert("Failed to update subtask!");
+                this.checked = !this.checked; // revert checkbox if failed
             }
+        })
+        .catch(err => {
+            alert("Error updating subtask!");
+            this.checked = !this.checked;
         });
     });
 });
